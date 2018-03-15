@@ -1,17 +1,14 @@
 package com.xjyy.orm;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class MappingInfo {
 	private String className;
 	private String dataSourceName;
 	private String tableName;
-	private List<String> primaryKeysName;
+
 	private Table table;
 
 	public MappingInfo() {
-		this.primaryKeysName = new ArrayList<String>();
+
 	}
 
 	public String getClassName() {
@@ -28,12 +25,6 @@ public class MappingInfo {
 
 	public void setTableName(String table) {
 		this.tableName = table;
-	}
-
-	public void setPrimaryKeys(String primaryKeys) {
-		for (String x : primaryKeys.split(",")) {
-			this.primaryKeysName.add(x);
-		}
 	}
 
 	public void setClassName(String className) {
@@ -56,7 +47,7 @@ public class MappingInfo {
 	 */
 	private void updatePrimaryKey() {
 		for (Field x : this.table.getFields()) {
-			for (String y : this.primaryKeysName) {
+			for (String y : this.table.getPrimaryKeysName()) {
 				if (y.equals(x.getName())) {
 					x.isPrimaryKey(true);
 				}

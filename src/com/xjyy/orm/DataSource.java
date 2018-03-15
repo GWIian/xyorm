@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map;
 
 import com.xjyy.adapter.Adapter;
 
@@ -92,7 +93,37 @@ public class DataSource {
 		return this.adapter.getTable(this.connection, name);
 	}
 
-	public ResultSet getRecords(Table table, String filter) {
-		return this.adapter.getRecords(connection, table, filter);
+	/**
+	 * 获取记录
+	 * 
+	 * @param table
+	 * @param filter
+	 * @return
+	 */
+	public ResultSet getRecords(MappingInfo mappingInfo, String filter) {
+		return this.adapter.getRecords(connection, mappingInfo.getTable(), filter);
+	}
+
+	/**
+	 * 添加记录
+	 * 
+	 * @param connection
+	 * @param table
+	 * @param record
+	 * @return
+	 */
+	public int addRecord(MappingInfo mappingInfo, Map<String, Object> record) {
+		return this.adapter.addRecord(this.connection, mappingInfo.getTable(), record);
+	}
+
+	/**
+	 * 更新记录
+	 * 
+	 * @param mappingInfo
+	 * @param record
+	 * @return
+	 */
+	public int updateRecord(MappingInfo mappingInfo, Map<String, Object> record) {
+		return this.adapter.updateRecord(this.connection, mappingInfo.getTable(), record);
 	}
 }

@@ -5,13 +5,21 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Map;
 
 import com.xjyy.orm.Field;
 import com.xjyy.orm.Table;
 
-public class OracleAdapter extends Adapter {
+public class SqliteAdapter extends Adapter {
+
+	public SqliteAdapter() {
+		try {
+			Class.forName("org.sqlite.JDBC");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+
 	@Override
 	public Table getTable(Connection connection, String name) {
 		Table table = new Table(name);
@@ -34,12 +42,7 @@ public class OracleAdapter extends Adapter {
 	@Override
 	public ResultSet getRecords(Connection connection, Table table, String filter) {
 		try {
-			StringBuilder sbSql = new StringBuilder("select * from ").append(table.getName());
-			if (filter != null && !filter.trim().equals("")) {
-				sbSql.append(" where ").append(filter);
-			}
-			PreparedStatement stmt = connection.prepareStatement(sbSql.toString());
-			return stmt.executeQuery();
+			return connection.prepareStatement("select * from " + table.getName() + " " + filter).executeQuery();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -77,41 +80,7 @@ public class OracleAdapter extends Adapter {
 
 	@Override
 	public int updateRecord(Connection connection, Table table, Map<String, Object> record) {
-		StringBuilder sbSql = new StringBuilder("update ").append(table.getName()).append(" set");
-		StringBuilder sbFilter = new StringBuilder(" where 1=1");
-		ArrayList<Object> values = new ArrayList<Object>();
-		ArrayList<Object> filters = new ArrayList<Object>();
-
-		int i = 0;
-		for (Field field : table.getFields()) {
-			if (field.isPrimaryKey()) {
-				sbFilter.append(" and ").append(field.getName()).append("=?");
-				filters.add(record.get(field.getName()));
-			} else {
-				sbSql.append(" ").append(field.getName()).append("=?,");
-				values.add(record.get(field.getName()));
-				i++;
-			}
-
-		}
-		if (i > 0) {
-			sbSql.deleteCharAt(sbSql.length() - 1);
-		}
-		sbSql.append(sbFilter);
-		values.addAll(filters);
-
-		PreparedStatement stmt;
-		try {
-			stmt = connection.prepareStatement(sbSql.toString());
-			for (i = 0; i < values.size(); i++) {
-				stmt.setObject(i + 1, values.get(i));
-			}
-			int ret = stmt.executeUpdate();
-			stmt.close();
-			return ret;
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		// TODO 自动生成的方法存根
 		return 0;
 	}
 

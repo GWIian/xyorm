@@ -12,14 +12,15 @@ import java.util.Map;
 public class Model<T> {
 	private MappingInfo mappingInfo;
 	private Map<String, Object> attributes;
-	// private boolean isDao;
 
 	protected Model() {
 		this.setMappingInfo();
 		this.setAttributes();
-		// this.isDao = false;
 	}
 
+	/**
+	 * 初始化映射信息
+	 */
 	private void setMappingInfo() {
 		for (MappingInfo x : Orm.getInstance().getMappingInfos()) {
 			if (x.getClassName().equals(this.getClass().getName())) {
@@ -28,6 +29,9 @@ public class Model<T> {
 		}
 	}
 
+	/**
+	 * 初始化Attributes
+	 */
 	private void setAttributes() {
 		this.attributes = new HashMap<String, Object>();
 		for (Field x : this.mappingInfo.getTable().getFields()) {
@@ -35,34 +39,45 @@ public class Model<T> {
 		}
 	}
 
+	/**
+	 * Override toString()
+	 */
+	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		int count = 0;
-		sb.append("{");
-		for (Map.Entry<String, Object> x : this.attributes.entrySet()) {
-			sb.append(x.getKey());
-			sb.append(":");
-			sb.append(x.getValue());
-			sb.append(",");
-		}
-		if (count > 0) {
-			sb.deleteCharAt(-1);
-		}
-		sb.append("}");
-		return sb.toString();
+		return this.attributes.toString();
 	}
 
-	public void set(String key, Object value) {
+	/**
+	 * 设置字段值
+	 * 
+	 * @param key
+	 * @param value
+	 */
+	@SuppressWarnings("unchecked")
+	public T set(String key, Object value) {
 		this.attributes.put(key, value);
+		return (T) this;
 	}
 
+	/**
+	 * 获取字段值
+	 * 
+	 * @param key
+	 * @return
+	 */
 	public Object get(String key) {
 		return this.attributes.get(key);
 	}
 
-	public List<T> findAll() {
+	/**
+	 * 查找记录
+	 * 
+	 * @param filter
+	 * @return
+	 */
+	public List<T> find(String filter) {
 		ResultSet rs = Orm.getInstance().getDataSource(this.mappingInfo.getDataSourceName())
-				.getRecords(this.mappingInfo.getTable(), "");
+				.getRecords(this.mappingInfo, filter);
 		ArrayList<T> datas = new ArrayList<T>();
 		try {
 			Method set = this.getClass().getMethod("set", String.class, Object.class);
@@ -74,6 +89,7 @@ public class Model<T> {
 				}
 				datas.add(data);
 			}
+			rs.getStatement().close();
 			rs.close();
 		} catch (SQLException | IllegalArgumentException | NoSuchMethodException | SecurityException
 				| IllegalAccessException | InvocationTargetException | InstantiationException e) {
@@ -83,4 +99,50 @@ public class Model<T> {
 		return datas;
 	}
 
+	/**
+	 * 查找第一条记录
+	 * 
+	 * @param filter
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public T findFirst(String filter) {
+		ResultSet rs = Orm.getInstance().getDataSource(this.mappingInfo.getDataSourceName())
+				.getRecords(this.mappingInfo, filter);
+
+		T data = null;
+		try {
+			Method set = this.getClass().getMethod("set", String.class, Object.class);
+			if (rs.next()) {
+				data = (T) this.getClass().newInstance();
+				for (String x : this.attributes.keySet()) {
+					set.invoke(data, x, rs.getObject(x));
+				}
+			}
+			rs.getStatement().close();
+			rs.close();
+			return data;
+		} catch (SQLException | IllegalArgumentException | NoSuchMethodException | SecurityException
+				| IllegalAccessException | InvocationTargetException | InstantiationException e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	/**
+	 * 写入一条新记录
+	 */
+	public void save() {
+		Orm.getInstance().getDataSource(this.mappingInfo.getDataSourceName()).addRecord(this.mappingInfo,
+				this.attributes);
+	}
+
+	/**
+	 * 更新记录
+	 */
+	public void update() {
+		Orm.getInstance().getDataSource(this.mappingInfo.getDataSourceName()).updateRecord(this.mappingInfo,
+				this.attributes);
+	}
 }

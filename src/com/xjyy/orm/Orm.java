@@ -79,9 +79,10 @@ public class Orm {
 		}
 		mappingInfo.setDataSourceName(dataSource);
 		mappingInfo.setTableName(table);
-		mappingInfo.setPrimaryKeys(primary);
+
 		mappingInfo.setClassName(cls.getName());
 		mappingInfo.setTable();
+		mappingInfo.getTable().setPrimaryKeysName(primary);
 	}
 
 	/**
