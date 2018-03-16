@@ -14,21 +14,21 @@ public class Start {
 
 	public static void main(String[] args) {
 
-		DataSource ds = new DataSource("jdbc:oracle:thin:@localhost:1521:orcl", "user", "password");
-		ds.setAdapter(new OracleAdapter());
-		Orm.getInstance().addDataSource(ds);
+		DataSource ds = new DataSource("jdbc:oracle:thin:@localhost:1521:orcl", "user", "password");//定义数据源
+		ds.setAdapter(new OracleAdapter());//设置数据库类型
+		Orm.getInstance().addDataSource(ds);//添加数据源
 		
-		Orm.getInstance().init();
-		Orm.getInstance().addMappingInfo("TEST", "ID,KEY", Test.class);
+		Orm.getInstance().init();//启动ORM
+		Orm.getInstance().addMappingInfo("TEST", "ID,KEY", Test.class);//添加Model到表的映射，第二个参数是主键，联合主键用逗号隔开
 
-		new Test().find("");
-		new Test().findFirst("ID=1");
-		new Test().get("ID");
-		new Test().set("ID", 1).save();
-		new Test().set("ID", 1).delete();
-		new Test().set("ID", 1).update();
+		new Test().find("");//查找记录
+		new Test().findFirst("ID=1");//查找第一条记录
+		new Test().get("ID");//获取字段的值
+		new Test().set("ID", 1).save();//插入记录
+		new Test().set("ID", 1).delete();//删除记录
+		new Test().set("ID", 1).update();//更新记录
 		
-		Orm.getInstance().stop();
+		Orm.getInstance().stop();//停止ORM
 	}
 }
 ```
@@ -37,6 +37,7 @@ Test.java
 ```
 import com.xjyy.orm.Model;
 
+//自定义Model只需要继承Model类即可，如果有额外的逻辑自行写方法即可
 public class Test extends Model<Test> {
 
 }
