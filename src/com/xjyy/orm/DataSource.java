@@ -126,4 +126,14 @@ public class DataSource {
 	public int updateRecord(MappingInfo mappingInfo, Map<String, Object> record) {
 		return this.adapter.updateRecord(this.connection, mappingInfo.getTable(), record);
 	}
+
+	/**
+	 * 删除记录
+	 * @param mappingInfo
+	 * @param record
+	 * @return
+	 */
+	public int removeRecord(MappingInfo mappingInfo, Map<String, Object> record) {
+		return this.adapter.removeRecord(this.connection, mappingInfo.getTable(), record);
+	}
 }

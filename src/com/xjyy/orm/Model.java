@@ -145,4 +145,12 @@ public class Model<T> {
 		Orm.getInstance().getDataSource(this.mappingInfo.getDataSourceName()).updateRecord(this.mappingInfo,
 				this.attributes);
 	}
+
+	/**
+	 * 删除记录
+	 */
+	public void delete() {
+		Orm.getInstance().getDataSource(this.mappingInfo.getDataSourceName()).removeRecord(this.mappingInfo,
+				this.attributes);
+	}
 }

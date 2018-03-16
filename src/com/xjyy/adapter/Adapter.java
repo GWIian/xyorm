@@ -38,10 +38,20 @@ public abstract class Adapter {
 
 	/**
 	 * 更新记录
+	 * 
 	 * @param connection
 	 * @param table
 	 * @param record
 	 * @return
 	 */
 	public abstract int updateRecord(Connection connection, Table table, Map<String, Object> record);
+
+	/**
+	 * 删除记录
+	 * @param connection
+	 * @param table
+	 * @param record
+	 * @return
+	 */
+	public abstract int removeRecord(Connection connection, Table table, Map<String, Object> record);
 }

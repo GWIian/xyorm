@@ -12,6 +12,15 @@ import com.xjyy.orm.Field;
 import com.xjyy.orm.Table;
 
 public class OracleAdapter extends Adapter {
+
+	public OracleAdapter() {
+		try {
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+
 	@Override
 	public Table getTable(Connection connection, String name) {
 		Table table = new Table(name);
@@ -112,6 +121,38 @@ public class OracleAdapter extends Adapter {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		return 0;
+	}
+
+	@Override
+	public int removeRecord(Connection connection, Table table, Map<String, Object> record) {
+		StringBuilder sbSql = new StringBuilder("delete from ").append(table.getName()).append(" where");
+		StringBuilder sbFilter = new StringBuilder();
+		int primaryCount = 0;
+		ArrayList<Object> primaryValues = new ArrayList<Object>();
+		for (String x : table.getPrimaryKeysName()) {
+			sbFilter.append(" and ").append(x).append("=?");
+			primaryValues.add(record.get(x));
+			primaryCount++;
+		}
+		if (primaryCount > 0) {
+			sbSql.append(" 1=1");
+		}
+		sbSql.append(sbFilter);
+		System.out.println(sbSql);
+		PreparedStatement stmt;
+		try {
+			stmt = connection.prepareStatement(sbSql.toString());
+			for (int i = 0; i < primaryValues.size(); i++) {
+				stmt.setObject(i + 1, primaryValues.get(i));
+			}
+			int ret = stmt.executeUpdate();
+			stmt.close();
+			return ret;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
 		return 0;
 	}
 
