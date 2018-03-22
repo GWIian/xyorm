@@ -13,7 +13,7 @@ public class Model<T> {
 	private MappingInfo mappingInfo;
 	private Map<String, Object> attributes;
 
-	protected Model() {
+	public Model() {
 		this.setMappingInfo();
 		this.setAttributes();
 	}
@@ -67,6 +67,24 @@ public class Model<T> {
 	 */
 	public Object get(String key) {
 		return this.attributes.get(key);
+	}
+
+	/**
+	 * 根据主键获取记录
+	 * 
+	 * @param primarys
+	 * @return
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public T findByPrimarys(Object... primarys) {
+		try {
+			return (T) Orm.getInstance().getDataSource(this.mappingInfo.getDataSourceName())
+					.getRecordByPrimarys(this.mappingInfo, this.getClass(), primarys);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	/**

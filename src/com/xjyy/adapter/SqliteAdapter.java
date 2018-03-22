@@ -156,4 +156,35 @@ public class SqliteAdapter extends Adapter {
 		return 0;
 	}
 
+	@Override
+	public <T> T getRecordByPrimarys(Connection connection, Table table, Class<T> recordType, Object... primarys)
+			throws Exception {
+		T record = null;
+		if (table.getPrimaryKeysName().size() == 0) {
+			throw new Exception("没有定义主键");
+		}
+		StringBuilder sbSql = new StringBuilder("select * from ").append(table.getName()).append(" where 1=1");
+		for (String primaryName : table.getPrimaryKeysName()) {
+			sbSql.append(" and ").append(primaryName).append("=?");
+		}
+		PreparedStatement stmt = connection.prepareStatement(sbSql.toString());
+		int i = 1;
+		for (Object primaryValue : primarys) {
+			stmt.setObject(i, primaryValue);
+			i++;
+		}
+		ResultSet rs = stmt.executeQuery();
+		if (rs.next()) {
+			record = recordType.newInstance();
+			for (Field field : table.getFields()) {
+				recordType.getMethod("set", String.class, Object.class).invoke(record, field.getName(),
+						rs.getObject(field.getName()));
+
+			}
+		}
+		rs.close();
+		stmt.close();
+		return record;
+	}
+
 }

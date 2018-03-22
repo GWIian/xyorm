@@ -17,6 +17,16 @@ public abstract class Adapter {
 	public abstract Table getTable(Connection connection, String name);
 
 	/**
+	 * 根据主键获取记录
+	 * 
+	 * @param mappingInfo
+	 * @param primarys
+	 * @return
+	 */
+	public abstract <T> T getRecordByPrimarys(Connection connection, Table table, Class<T> recordType,
+			Object... primarys) throws Exception;
+
+	/**
 	 * 获取记录
 	 * 
 	 * @param connection
@@ -48,6 +58,7 @@ public abstract class Adapter {
 
 	/**
 	 * 删除记录
+	 * 
 	 * @param connection
 	 * @param table
 	 * @param record

@@ -94,6 +94,19 @@ public class DataSource {
 	}
 
 	/**
+	 * 根据主键获取记录
+	 * 
+	 * @param mappingInfo
+	 * @param primarys
+	 * @return
+	 * @throws Exception
+	 */
+	public <T> T getRecordByPrimarys(MappingInfo mappingInfo, Class<T> recordType, Object... primarys)
+			throws Exception {
+		return this.adapter.getRecordByPrimarys(this.connection, mappingInfo.getTable(), recordType, primarys);
+	}
+
+	/**
 	 * 获取记录
 	 * 
 	 * @param table
@@ -129,6 +142,7 @@ public class DataSource {
 
 	/**
 	 * 删除记录
+	 * 
 	 * @param mappingInfo
 	 * @param record
 	 * @return
