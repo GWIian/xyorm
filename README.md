@@ -21,6 +21,7 @@ public class Start {
 		Orm.getInstance().init();//启动ORM
 		Orm.getInstance().addMappingInfo("TEST", "ID,KEY", Test.class);//添加Model到表的映射，第二个参数是主键，联合主键用逗号隔开
 
+		new Test().findByPrimarys(1);//根据主键获取记录
 		new Test().find("");//查找记录
 		new Test().findFirst("ID=1");//查找第一条记录
 		new Test().get("ID");//获取字段的值
