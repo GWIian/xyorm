@@ -171,4 +171,28 @@ public class Model<T> {
 		Orm.getInstance().getDataSource(this.mappingInfo.getDataSourceName()).removeRecord(this.mappingInfo,
 				this.attributes);
 	}
+
+	/**
+	 * 分页记录
+	 * @param filter
+	 * @param pageNumber
+	 * @param pageSize
+	 * @param params
+	 * @return
+	 */
+	public Page<T> paginate(String filter, int pageNumber, int pageSize, Object... params) {
+		Page<T> page = null;
+		DataSource ds = Orm.getInstance().getDataSource(this.mappingInfo.getDataSourceName());
+		try {
+			int rowCount = ds.getRecordsCount(this.mappingInfo, filter, params);
+			@SuppressWarnings({ "unchecked" })
+			List<T> list = (List<T>) ds.getRecordsByPage(this.mappingInfo, pageNumber, pageSize, filter,
+					this.getClass(), params);
+			int pageCount = rowCount % pageSize == 0 ? rowCount / pageSize : rowCount / pageSize + 1;
+			page = new Page<T>(list, pageNumber, list.size(), pageCount, rowCount);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return page;
+	}
 }

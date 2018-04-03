@@ -12,11 +12,11 @@ import java.util.Map;
 import com.xjyy.orm.Field;
 import com.xjyy.orm.Table;
 
-public class SqliteAdapter extends Adapter {
+public class MySQLAdapter extends Adapter {
 
-	public SqliteAdapter() {
+	public MySQLAdapter() {
 		try {
-			Class.forName("org.sqlite.JDBC");
+			Class.forName("com.mysql.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}

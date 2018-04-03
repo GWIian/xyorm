@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import com.xjyy.orm.Field;
@@ -187,4 +188,56 @@ public class OracleAdapter extends Adapter {
 		return record;
 	}
 
+	@Override
+	public int getRecordsCount(Connection connection, Table table, String filter, Object... params)
+			throws SQLException {
+		int count = -1;
+		StringBuilder sbSql = new StringBuilder("select count(*) from ").append(table.getName());
+		if (filter != null && filter.trim().length() > 0) {
+			sbSql.append(" where ").append(filter);
+		}
+		System.err.println(sbSql);
+		PreparedStatement stmt = connection.prepareStatement(sbSql.toString());
+		int i = 1;
+		for (Object param : params) {
+			stmt.setObject(i++, param);
+		}
+		ResultSet rs = stmt.executeQuery();
+		if (rs.next()) {
+			count = rs.getInt(1);
+		}
+		rs.close();
+		stmt.close();
+		return count;
+	}
+
+	@Override
+	public <T> List<T> getRecordsByPage(Connection connection, Table table, int pageNumber, int pageSize, String filter,
+			Class<T> recordType, Object... params) throws Exception {
+		List<T> list = new ArrayList<T>();
+		StringBuilder sbSql = new StringBuilder("select * from (select rownum r,t.* from ").append(table.getName())
+				.append(" t  where rownum<=").append(pageNumber * pageSize);
+		if (filter != null && filter.trim().length() > 0) {
+			sbSql.append(" and (").append(filter).append(")");
+		}
+		sbSql.append(") where r>").append(pageNumber * pageSize - pageSize);
+		System.err.println(sbSql);
+		PreparedStatement stmt = connection.prepareStatement(sbSql.toString());
+		int i = 1;
+		for (Object param : params) {
+			stmt.setObject(i++, param);
+		}
+		ResultSet rs = stmt.executeQuery();
+		while (rs.next()) {
+			T record = recordType.newInstance();
+			for (Field field : table.getFields()) {
+				recordType.getMethod("set", String.class, Object.class).invoke(record, field.getName(),
+						rs.getObject(field.getName()));
+			}
+			list.add(record);
+		}
+		rs.close();
+		stmt.close();
+		return list;
+	}
 }

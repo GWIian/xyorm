@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 
 import com.xjyy.adapter.Adapter;
@@ -149,5 +150,34 @@ public class DataSource {
 	 */
 	public int removeRecord(MappingInfo mappingInfo, Map<String, Object> record) {
 		return this.adapter.removeRecord(this.connection, mappingInfo.getTable(), record);
+	}
+
+	/**
+	 * 获取某表记录行数
+	 * @param mappingInfo
+	 * @param filter
+	 * @param params
+	 * @return
+	 * @throws SQLException
+	 */
+	public int getRecordsCount(MappingInfo mappingInfo, String filter, Object... params) throws SQLException {
+		return this.adapter.getRecordsCount(this.connection, mappingInfo.getTable(), filter, params);
+	}
+
+	/**
+	 * 根据分页获取记录
+	 * 
+	 * @param mappingInfo
+	 * @param filter
+	 * @param pageNumber
+	 * @param pageSize
+	 * @param recordType
+	 * @return
+	 * @throws Exception
+	 */
+	public <T> List<T> getRecordsByPage(MappingInfo mappingInfo, int pageNumber, int pageSize, String filter,
+			Class<T> recordType, Object... params) throws Exception {
+		return this.adapter.getRecordsByPage(this.connection, mappingInfo.getTable(), pageNumber, pageSize, filter,
+				recordType, params);
 	}
 }
