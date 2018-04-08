@@ -21,7 +21,10 @@ public class Table {
 	public void setPrimaryKeysName(String primaryKeys) {
 		for (String x : primaryKeys.split(",")) {
 			this.primaryKeysName.add(x);
-			this.getField(x).isPrimaryKey(true);
+			Field field = this.getField(x);
+			if (field != null) {
+				field.isPrimaryKey(true);
+			}
 		}
 	}
 

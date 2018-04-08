@@ -1,7 +1,9 @@
 package com.xjyy.orm;
 
+import java.lang.Thread.State;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -91,10 +93,40 @@ public class Model<T> {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<T> find(String filter, Object... params) {
-		List<T> list = new ArrayList<>();
+		List<T> list = new LinkedList<T>();
 		try {
-			list = (List<T>) Orm.getInstance().getDataSource(this.mappingInfo.getDataSourceName())
-					.getRecords(this.mappingInfo, filter, this.getClass(), params);
+			DataSource ds = Orm.getInstance().getDataSource(this.mappingInfo.getDataSourceName());
+			int count = ds.getRecordsCount(this.mappingInfo, filter, params);
+			// new
+			// FloodProcesser(FloodProcesser.FP_PAGINATE,this.getClass(),filter,1,10,params).start();
+			if (count > 2000) {// 大于4000条记录开启flood模式
+				int pageCount = 100;
+				int pageSize=0;
+				if (count % pageCount > 0) {
+					pageSize = count / pageCount + 1;
+				} else {
+					pageSize = count / pageCount;
+				}
+
+				List<FloodProcesser> processers = new ArrayList<FloodProcesser>();
+				for (int i = 0; i < pageCount; i++) {
+					processers.add(new FloodProcesser(FloodProcesser.FP_PAGINATE, this.getClass(), filter, i + 1, pageSize,
+							params));
+					processers.get(i).start();
+				}
+				for (FloodProcesser p : processers) {
+					while (true) {
+						if (p.getState() != null && p.getState() == State.TERMINATED) {
+							list.addAll(((Page<T>) p.getRetValue()).getList());
+							break;
+						}
+						Thread.sleep(3);
+					}
+				}
+			} else {
+				list = (List<T>) ds.getRecords(this.mappingInfo, filter, this.getClass(), params);
+			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -112,7 +144,7 @@ public class Model<T> {
 		T data = null;
 		try {
 			data = (T) Orm.getInstance().getDataSource(this.mappingInfo.getDataSourceName())
-					.getRecords(this.mappingInfo, filter, this.getClass(), params).get(0);
+					.getRecordsByPage(this.mappingInfo, 1, 1, filter, this.getClass(), params).get(0);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -179,5 +211,22 @@ public class Model<T> {
 			e.printStackTrace();
 		}
 		return page;
+	}
+
+	/**
+	 * 获取数据条数
+	 * 
+	 * @param filter
+	 * @return
+	 */
+	public int getCount(String filter, Object... params) {
+		int count = 0;
+		try {
+			count = Orm.getInstance().getDataSource(this.mappingInfo.getDataSourceName())
+					.getRecordsCount(this.mappingInfo, filter, params);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return count;
 	}
 }

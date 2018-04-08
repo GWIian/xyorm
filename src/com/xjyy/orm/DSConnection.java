@@ -20,6 +20,9 @@ public class DSConnection {
 
 	private Connection connection;
 	private int status;
+	private String url;
+	private String user;
+	private String password;
 
 	public DSConnection(String url, String user, String password) {
 		try {
@@ -30,6 +33,18 @@ public class DSConnection {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * 重新激活连接
+	 */
+	public void reActive() {
+		try {
+			this.connection = DriverManager.getConnection(this.url, this.user, this.password);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		this.status = DSC_READY;
+	}
 
 	/**
 	 * 获取状态
@@ -38,7 +53,7 @@ public class DSConnection {
 	 */
 	public int getStatus() {
 		try {
-			if (this.connection.isValid(3000)) {
+			if (!this.connection.isValid(3000)) {
 				this.status = DSC_INVALID;
 			}
 		} catch (SQLException e) {

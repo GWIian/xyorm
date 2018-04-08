@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -61,8 +62,7 @@ public class OracleAdapter extends Adapter {
 	// }
 	public <T> List<T> getRecords(DSConnection connection, Table table, String filter, Class<T> recordType,
 			Object... params) {
-		List<T> list = new ArrayList<>();
-
+		List<T> list = new LinkedList<>();
 		StringBuilder sbSql = new StringBuilder("select * from ").append(table.getName());
 		if (filter != null && filter.trim().length() > 0) {
 			sbSql.append(" where ").append(filter);
@@ -79,8 +79,8 @@ public class OracleAdapter extends Adapter {
 				for (Field field : table.getFields()) {
 					recordType.getMethod("set", String.class, Object.class).invoke(record, field.getName(),
 							rs.getObject(field.getName()));
-					list.add(record);
 				}
+				list.add(record);
 			}
 			rs.close();
 			stmt.close();
@@ -236,7 +236,6 @@ public class OracleAdapter extends Adapter {
 		if (filter != null && filter.trim().length() > 0) {
 			sbSql.append(" where ").append(filter);
 		}
-		System.err.println(sbSql);
 		PreparedStatement stmt = connection.open().prepareStatement(sbSql.toString());
 		int i = 1;
 		for (Object param : params) {
@@ -255,14 +254,14 @@ public class OracleAdapter extends Adapter {
 	@Override
 	public <T> List<T> getRecordsByPage(DSConnection connection, Table table, int pageNumber, int pageSize,
 			String filter, Class<T> recordType, Object... params) throws Exception {
-		List<T> list = new ArrayList<T>();
+		List<T> list = new LinkedList<T>();
 		StringBuilder sbSql = new StringBuilder("select * from (select rownum r,t.* from ").append(table.getName())
 				.append(" t  where rownum<=").append(pageNumber * pageSize);
 		if (filter != null && filter.trim().length() > 0) {
 			sbSql.append(" and (").append(filter).append(")");
 		}
 		sbSql.append(") where r>").append(pageNumber * pageSize - pageSize);
-		System.err.println(sbSql);
+		// System.err.println(sbSql);
 		PreparedStatement stmt = connection.open().prepareStatement(sbSql.toString());
 		int i = 1;
 		for (Object param : params) {
@@ -279,6 +278,7 @@ public class OracleAdapter extends Adapter {
 		}
 		rs.close();
 		stmt.close();
+		connection.close();
 		return list;
 	}
 }

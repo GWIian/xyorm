@@ -35,6 +35,7 @@ public class DataSource {
 		this.password = password;
 		this.connections = new LinkedList<DSConnection>();
 		this.status = DS_STOP;
+		this.minPoolSize = 10;
 	}
 
 	/**
@@ -50,6 +51,7 @@ public class DataSource {
 		this.name = dataSourceName;
 		this.connections = new LinkedList<DSConnection>();
 		this.status = DS_STOP;
+		this.minPoolSize = 10;
 	}
 
 	/**
@@ -105,14 +107,23 @@ public class DataSource {
 	 * @throws Exception
 	 */
 	public synchronized DSConnection getConnection() throws Exception {
+		// for (DSConnection con : this.connections) {
+		// System.out.print(con.getStatus() + "_");
+		//
+		// }
+		// System.out.println();
 		if (DS_READY == this.status) {
 			for (DSConnection connection : this.connections) {
 				if (DSConnection.DSC_READY == connection.getStatus()) {
+					connection.open();
 					return connection;
+				} else if (DSConnection.DSC_INVALID == connection.getStatus()) {
+					connection.reActive();
 				}
 			}
 			DSConnection connection = new DSConnection(this.url, this.user, this.password);
 			this.connections.add(connection);
+			connection.open();
 			return connection;
 		} else {
 			throw new Exception("数据源没有初始化");

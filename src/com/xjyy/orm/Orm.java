@@ -64,9 +64,9 @@ public class Orm {
 	 * @param table
 	 * @param primary
 	 * @param cls
-	 * @throws Exception 
+	 * @throws Exception
 	 */
-	public void addMappingInfo(String dataSource, String table, String primary, Class<? extends Model<?>> cls) throws Exception {
+	public void addMappingInfo(String dataSource, String table, String primary, Class<? extends Model<?>> cls) {
 		MappingInfo mappingInfo = null;
 		for (MappingInfo x : this.mappingInfos) {
 			if (cls.getName().equals(x.getClassName())) {
@@ -82,7 +82,12 @@ public class Orm {
 		mappingInfo.setTableName(table);
 
 		mappingInfo.setClassName(cls.getName());
-		mappingInfo.setTable();
+		try {
+			mappingInfo.setTable();
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
 		mappingInfo.getTable().setPrimaryKeysName(primary);
 	}
 
@@ -92,10 +97,15 @@ public class Orm {
 	 * @param table
 	 * @param primary
 	 * @param cls
-	 * @throws Exception 
+	 * @throws Exception
 	 */
-	public void addMappingInfo(String table, String primary, Class<? extends Model<?>> cls) throws Exception {
-		this.addMappingInfo("main", table, primary, cls);
+	public void addMappingInfo(String table, String primary, Class<? extends Model<?>> cls) {
+		try {
+			this.addMappingInfo("main", table, primary, cls);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
 	}
 
 	/**
