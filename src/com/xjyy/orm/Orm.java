@@ -64,8 +64,9 @@ public class Orm {
 	 * @param table
 	 * @param primary
 	 * @param cls
+	 * @throws Exception 
 	 */
-	public void addMappingInfo(String dataSource, String table, String primary, Class<? extends Model<?>> cls) {
+	public void addMappingInfo(String dataSource, String table, String primary, Class<? extends Model<?>> cls) throws Exception {
 		MappingInfo mappingInfo = null;
 		for (MappingInfo x : this.mappingInfos) {
 			if (cls.getName().equals(x.getClassName())) {
@@ -91,8 +92,9 @@ public class Orm {
 	 * @param table
 	 * @param primary
 	 * @param cls
+	 * @throws Exception 
 	 */
-	public void addMappingInfo(String table, String primary, Class<? extends Model<?>> cls) {
+	public void addMappingInfo(String table, String primary, Class<? extends Model<?>> cls) throws Exception {
 		this.addMappingInfo("main", table, primary, cls);
 	}
 

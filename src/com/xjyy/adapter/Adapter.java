@@ -1,11 +1,10 @@
 package com.xjyy.adapter;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import com.xjyy.orm.DSConnection;
 import com.xjyy.orm.Table;
 
 public abstract class Adapter {
@@ -16,7 +15,7 @@ public abstract class Adapter {
 	 * @param name
 	 * @return
 	 */
-	public abstract Table getTable(Connection connection, String name);
+	public abstract Table getTable(DSConnection connection, String name);
 
 	/**
 	 * 根据主键获取记录
@@ -25,7 +24,7 @@ public abstract class Adapter {
 	 * @param primarys
 	 * @return
 	 */
-	public abstract <T> T getRecordByPrimarys(Connection connection, Table table, Class<T> recordType,
+	public abstract <T> T getRecordByPrimarys(DSConnection connection, Table table, Class<T> recordType,
 			Object... primarys) throws Exception;
 
 	/**
@@ -36,7 +35,8 @@ public abstract class Adapter {
 	 * @param filter
 	 * @return
 	 */
-	public abstract ResultSet getRecords(Connection connection, Table table, String filter);
+	public abstract <T> List<T> getRecords(DSConnection connection, Table table, String filter, Class<T> recordType,
+			Object... params);
 
 	/**
 	 * 添加记录
@@ -46,7 +46,7 @@ public abstract class Adapter {
 	 * @param record
 	 * @return
 	 */
-	public abstract int addRecord(Connection connection, Table table, Map<String, Object> record);
+	public abstract int addRecord(DSConnection connection, Table table, Map<String, Object> record);
 
 	/**
 	 * 更新记录
@@ -56,7 +56,7 @@ public abstract class Adapter {
 	 * @param record
 	 * @return
 	 */
-	public abstract int updateRecord(Connection connection, Table table, Map<String, Object> record);
+	public abstract int updateRecord(DSConnection connection, Table table, Map<String, Object> record);
 
 	/**
 	 * 删除记录
@@ -66,7 +66,7 @@ public abstract class Adapter {
 	 * @param record
 	 * @return
 	 */
-	public abstract int removeRecord(Connection connection, Table table, Map<String, Object> record);
+	public abstract int removeRecord(DSConnection connection, Table table, Map<String, Object> record);
 
 	/**
 	 * 获取某表记录行数
@@ -76,7 +76,7 @@ public abstract class Adapter {
 	 * @return
 	 * @throws SQLException
 	 */
-	public abstract int getRecordsCount(Connection connection, Table table, String filter, Object... params)
+	public abstract int getRecordsCount(DSConnection connection, Table table, String filter, Object... params)
 			throws SQLException;
 
 	/**
@@ -85,6 +85,6 @@ public abstract class Adapter {
 	 * @param connection
 	 * @return
 	 */
-	public abstract <T> List<T> getRecordsByPage(Connection connection, Table table, int pageNumber, int pageSize,
+	public abstract <T> List<T> getRecordsByPage(DSConnection connection, Table table, int pageNumber, int pageSize,
 			String filter, Class<T> recordType, Object... params) throws Exception;
 }

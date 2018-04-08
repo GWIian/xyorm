@@ -1,9 +1,5 @@
 package com.xjyy.orm;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -93,28 +89,16 @@ public class Model<T> {
 	 * @param filter
 	 * @return
 	 */
-	public List<T> find(String filter) {
-		ResultSet rs = Orm.getInstance().getDataSource(this.mappingInfo.getDataSourceName())
-				.getRecords(this.mappingInfo, filter);
-		ArrayList<T> datas = new ArrayList<T>();
+	@SuppressWarnings("unchecked")
+	public List<T> find(String filter, Object... params) {
+		List<T> list = new ArrayList<>();
 		try {
-			Method set = this.getClass().getMethod("set", String.class, Object.class);
-			while (rs.next()) {
-				@SuppressWarnings("unchecked")
-				T data = (T) this.getClass().newInstance();
-				for (String x : this.attributes.keySet()) {
-					set.invoke(data, x, rs.getObject(x));
-				}
-				datas.add(data);
-			}
-			rs.getStatement().close();
-			rs.close();
-		} catch (SQLException | IllegalArgumentException | NoSuchMethodException | SecurityException
-				| IllegalAccessException | InvocationTargetException | InstantiationException e) {
+			list = (List<T>) Orm.getInstance().getDataSource(this.mappingInfo.getDataSourceName())
+					.getRecords(this.mappingInfo, filter, this.getClass(), params);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		return datas;
+		return list;
 	}
 
 	/**
@@ -124,56 +108,57 @@ public class Model<T> {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public T findFirst(String filter) {
-		ResultSet rs = Orm.getInstance().getDataSource(this.mappingInfo.getDataSourceName())
-				.getRecords(this.mappingInfo, filter);
-
+	public T findFirst(String filter, Object... params) {
 		T data = null;
 		try {
-			Method set = this.getClass().getMethod("set", String.class, Object.class);
-			if (rs.next()) {
-				data = (T) this.getClass().newInstance();
-				for (String x : this.attributes.keySet()) {
-					set.invoke(data, x, rs.getObject(x));
-				}
-			}
-			rs.getStatement().close();
-			rs.close();
-			return data;
-		} catch (SQLException | IllegalArgumentException | NoSuchMethodException | SecurityException
-				| IllegalAccessException | InvocationTargetException | InstantiationException e) {
+			data = (T) Orm.getInstance().getDataSource(this.mappingInfo.getDataSourceName())
+					.getRecords(this.mappingInfo, filter, this.getClass(), params).get(0);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		return null;
+		return data;
 	}
 
 	/**
 	 * 写入一条新记录
 	 */
 	public void save() {
-		Orm.getInstance().getDataSource(this.mappingInfo.getDataSourceName()).addRecord(this.mappingInfo,
-				this.attributes);
+		try {
+			Orm.getInstance().getDataSource(this.mappingInfo.getDataSourceName()).addRecord(this.mappingInfo,
+					this.attributes);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
 	 * 更新记录
 	 */
 	public void update() {
-		Orm.getInstance().getDataSource(this.mappingInfo.getDataSourceName()).updateRecord(this.mappingInfo,
-				this.attributes);
+		try {
+			Orm.getInstance().getDataSource(this.mappingInfo.getDataSourceName()).updateRecord(this.mappingInfo,
+					this.attributes);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
 	 * 删除记录
 	 */
 	public void delete() {
-		Orm.getInstance().getDataSource(this.mappingInfo.getDataSourceName()).removeRecord(this.mappingInfo,
-				this.attributes);
+		try {
+			Orm.getInstance().getDataSource(this.mappingInfo.getDataSourceName()).removeRecord(this.mappingInfo,
+					this.attributes);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
 	 * 分页记录
+	 * 
 	 * @param filter
 	 * @param pageNumber
 	 * @param pageSize

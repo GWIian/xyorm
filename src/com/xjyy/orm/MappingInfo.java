@@ -31,7 +31,7 @@ public class MappingInfo {
 		this.className = className;
 	}
 
-	public void setTable() {
+	public void setTable() throws Exception {
 		this.table = Orm.getInstance().getDataSource(this.dataSourceName).getTable(this.tableName);
 	}
 
