@@ -28,6 +28,7 @@ public class Start {
 		new Test().set("ID", 1).save();//插入记录
 		new Test().set("ID", 1).delete();//删除记录
 		new Test().set("ID", 1).update();//更新记录
+		new Test().paginate("ID>2",1,20);//根据每页20条获取第一页，条件ID大于2
 		
 		Orm.getInstance().stop();//停止ORM
 	}
