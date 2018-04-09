@@ -1,7 +1,5 @@
 package com.xjyy.orm;
 
-import java.lang.Thread.State;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -96,37 +94,7 @@ public class Model<T> {
 		List<T> list = new LinkedList<T>();
 		try {
 			DataSource ds = Orm.getInstance().getDataSource(this.mappingInfo.getDataSourceName());
-			int count = ds.getRecordsCount(this.mappingInfo, filter, params);
-			// new
-			// FloodProcesser(FloodProcesser.FP_PAGINATE,this.getClass(),filter,1,10,params).start();
-			if (count > 2000) {// 大于4000条记录开启flood模式
-				int pageCount = 100;
-				int pageSize=0;
-				if (count % pageCount > 0) {
-					pageSize = count / pageCount + 1;
-				} else {
-					pageSize = count / pageCount;
-				}
-
-				List<FloodProcesser> processers = new ArrayList<FloodProcesser>();
-				for (int i = 0; i < pageCount; i++) {
-					processers.add(new FloodProcesser(FloodProcesser.FP_PAGINATE, this.getClass(), filter, i + 1, pageSize,
-							params));
-					processers.get(i).start();
-				}
-				for (FloodProcesser p : processers) {
-					while (true) {
-						if (p.getState() != null && p.getState() == State.TERMINATED) {
-							list.addAll(((Page<T>) p.getRetValue()).getList());
-							break;
-						}
-						Thread.sleep(3);
-					}
-				}
-			} else {
-				list = (List<T>) ds.getRecords(this.mappingInfo, filter, this.getClass(), params);
-			}
-
+			list = (List<T>) ds.getRecords(this.mappingInfo, filter, this.getClass(), params);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -143,8 +111,11 @@ public class Model<T> {
 	public T findFirst(String filter, Object... params) {
 		T data = null;
 		try {
-			data = (T) Orm.getInstance().getDataSource(this.mappingInfo.getDataSourceName())
-					.getRecordsByPage(this.mappingInfo, 1, 1, filter, this.getClass(), params).get(0);
+			List<T> list = (List<T>) Orm.getInstance().getDataSource(this.mappingInfo.getDataSourceName())
+					.getRecordsByPage(this.mappingInfo, 1, 1, filter, this.getClass(), params);
+			if (list.size() > 0) {
+				data = list.get(0);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -228,5 +199,31 @@ public class Model<T> {
 			e.printStackTrace();
 		}
 		return count;
+	}
+
+	/**
+	 * 获取对象的成员Map
+	 * 
+	 * @return
+	 */
+	public Map<String, Object> getAttributes() {
+		return this.attributes;
+	}
+
+	/**
+	 * 获取映射信息
+	 * 
+	 * @return
+	 */
+	public MappingInfo getMappingInfo() {
+		return this.mappingInfo;
+	}
+
+	/**
+	 * 获取对应数据源
+	 * @return
+	 */
+	public DataSource getDataSource() {
+		return Orm.getInstance().getDataSource(this.mappingInfo.getDataSourceName());
 	}
 }

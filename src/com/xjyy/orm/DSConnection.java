@@ -33,7 +33,7 @@ public class DSConnection {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * 重新激活连接
 	 */
@@ -68,7 +68,7 @@ public class DSConnection {
 	 * 
 	 * @return
 	 */
-	public Connection open() {
+	public Connection use() {
 		this.status = DSC_USING;
 		return this.connection;
 	}
@@ -76,7 +76,7 @@ public class DSConnection {
 	/**
 	 * 回收连接
 	 */
-	public void close() {
+	public void reback() {
 		this.status = DSC_READY;
 	}
 

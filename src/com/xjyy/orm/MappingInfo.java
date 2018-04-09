@@ -8,7 +8,7 @@ public class MappingInfo {
 	private Table table;
 
 	public MappingInfo() {
-
+		
 	}
 
 	public String getClassName() {

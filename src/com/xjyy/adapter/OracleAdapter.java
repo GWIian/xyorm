@@ -27,7 +27,7 @@ public class OracleAdapter extends Adapter {
 	public Table getTable(DSConnection connection, String name) {
 		Table table = new Table(name);
 		try {
-			ResultSet rs = connection.open().createStatement().executeQuery("select * from " + name);
+			ResultSet rs = connection.use().createStatement().executeQuery("select * from " + name);
 			ResultSetMetaData metaData = rs.getMetaData();
 			for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
 				Field field = new Field();
@@ -36,7 +36,7 @@ public class OracleAdapter extends Adapter {
 				table.addField(field);
 			}
 			rs.close();
-			connection.close();
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -68,7 +68,7 @@ public class OracleAdapter extends Adapter {
 			sbSql.append(" where ").append(filter);
 		}
 		try {
-			PreparedStatement stmt = connection.open().prepareStatement(sbSql.toString());
+			PreparedStatement stmt = connection.use().prepareStatement(sbSql.toString());
 			int i = 1;
 			for (Object param : params) {
 				stmt.setObject(i++, param);
@@ -87,7 +87,7 @@ public class OracleAdapter extends Adapter {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		connection.close();
+		
 
 		return list;
 	}
@@ -105,7 +105,7 @@ public class OracleAdapter extends Adapter {
 		sbFields.append(sbValues);
 		PreparedStatement stmt;
 		try {
-			stmt = connection.open().prepareStatement(sbFields.toString());
+			stmt = connection.use().prepareStatement(sbFields.toString());
 			int i = 1;
 			for (Field x : table.getFields()) {
 				stmt.setObject(i, record.get(x.getName()));
@@ -113,7 +113,7 @@ public class OracleAdapter extends Adapter {
 			}
 			int ret = stmt.executeUpdate();
 			stmt.close();
-			connection.close();
+			
 			return ret;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -149,13 +149,12 @@ public class OracleAdapter extends Adapter {
 
 		PreparedStatement stmt;
 		try {
-			stmt = connection.open().prepareStatement(sbSql.toString());
+			stmt = connection.use().prepareStatement(sbSql.toString());
 			for (i = 0; i < values.size(); i++) {
 				stmt.setObject(i + 1, values.get(i));
 			}
 			int ret = stmt.executeUpdate();
 			stmt.close();
-			connection.close();
 			return ret;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -178,16 +177,15 @@ public class OracleAdapter extends Adapter {
 			sbSql.append(" 1=1");
 		}
 		sbSql.append(sbFilter);
-		System.out.println(sbSql);
+		//System.out.println(sbSql);
 		PreparedStatement stmt;
 		try {
-			stmt = connection.open().prepareStatement(sbSql.toString());
+			stmt = connection.use().prepareStatement(sbSql.toString());
 			for (int i = 0; i < primaryValues.size(); i++) {
 				stmt.setObject(i + 1, primaryValues.get(i));
 			}
 			int ret = stmt.executeUpdate();
 			stmt.close();
-			connection.close();
 			return ret;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -207,7 +205,7 @@ public class OracleAdapter extends Adapter {
 		for (String primaryName : table.getPrimaryKeysName()) {
 			sbSql.append(" and ").append(primaryName).append("=?");
 		}
-		PreparedStatement stmt = connection.open().prepareStatement(sbSql.toString());
+		PreparedStatement stmt = connection.use().prepareStatement(sbSql.toString());
 		int i = 1;
 		for (Object primaryValue : primarys) {
 			stmt.setObject(i, primaryValue);
@@ -224,7 +222,6 @@ public class OracleAdapter extends Adapter {
 		}
 		rs.close();
 		stmt.close();
-		connection.close();
 		return record;
 	}
 
@@ -236,7 +233,7 @@ public class OracleAdapter extends Adapter {
 		if (filter != null && filter.trim().length() > 0) {
 			sbSql.append(" where ").append(filter);
 		}
-		PreparedStatement stmt = connection.open().prepareStatement(sbSql.toString());
+		PreparedStatement stmt = connection.use().prepareStatement(sbSql.toString());
 		int i = 1;
 		for (Object param : params) {
 			stmt.setObject(i++, param);
@@ -247,7 +244,6 @@ public class OracleAdapter extends Adapter {
 		}
 		rs.close();
 		stmt.close();
-		connection.close();
 		return count;
 	}
 
@@ -262,7 +258,7 @@ public class OracleAdapter extends Adapter {
 		}
 		sbSql.append(") where r>").append(pageNumber * pageSize - pageSize);
 		// System.err.println(sbSql);
-		PreparedStatement stmt = connection.open().prepareStatement(sbSql.toString());
+		PreparedStatement stmt = connection.use().prepareStatement(sbSql.toString());
 		int i = 1;
 		for (Object param : params) {
 			stmt.setObject(i++, param);
@@ -278,7 +274,6 @@ public class OracleAdapter extends Adapter {
 		}
 		rs.close();
 		stmt.close();
-		connection.close();
 		return list;
 	}
 }
