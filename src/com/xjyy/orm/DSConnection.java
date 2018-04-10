@@ -20,13 +20,16 @@ public class DSConnection {
 
 	private Connection connection;
 	private int status;
-	private String url;
 	private String user;
 	private String password;
+	private DataSource dataSource;
 
-	public DSConnection(String url, String user, String password) {
+	public DSConnection(DataSource dataSource, String user, String password) {
 		try {
-			this.connection = DriverManager.getConnection(url, user, password);
+			this.dataSource = dataSource;
+			this.user = user;
+			this.password = password;
+			this.connection = DriverManager.getConnection(this.dataSource.getUrl(), this.user, this.password);
 			this.status = DSC_READY;
 		} catch (Exception e) {
 			this.status = DSC_INVALID;
@@ -39,7 +42,7 @@ public class DSConnection {
 	 */
 	public void reActive() {
 		try {
-			this.connection = DriverManager.getConnection(this.url, this.user, this.password);
+			this.connection = DriverManager.getConnection(this.dataSource.getUrl(), this.user, this.password);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -53,12 +56,11 @@ public class DSConnection {
 	 */
 	public int getStatus() {
 		try {
-			if (!this.connection.isValid(3000)) {
+			if (!this.dataSource.getAdapter().isValid(this, 3000)) {
 				this.status = DSC_INVALID;
 			}
-		} catch (SQLException e) {
-			this.status = DSC_INVALID;
-			e.printStackTrace();
+		} catch (Exception e) {
+			this.status = DSC_READY;
 		}
 		return this.status;
 	}
@@ -74,9 +76,14 @@ public class DSConnection {
 	}
 
 	/**
-	 * 回收连接
+	 * 回收连接 @throws
 	 */
-	public void reback() {
+	void reback() {
+		try {
+			this.connection.setAutoCommit(true);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		this.status = DSC_READY;
 	}
 
@@ -90,5 +97,10 @@ public class DSConnection {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public String toString() {
+		return this.status + "";
 	}
 }

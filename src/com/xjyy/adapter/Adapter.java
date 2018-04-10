@@ -87,4 +87,12 @@ public abstract class Adapter {
 	 */
 	public abstract <T> List<T> getRecordsByPage(DSConnection connection, Table table, int pageNumber, int pageSize,
 			String filter, Class<T> recordType, Object... params) throws Exception;
+
+	/**
+	 * 连接是否可用
+	 * 
+	 * @param timeout
+	 * @return
+	 */
+	public abstract boolean isValid(DSConnection connection, int timeout);
 }

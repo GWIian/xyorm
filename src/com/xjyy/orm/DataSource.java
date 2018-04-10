@@ -2,6 +2,7 @@ package com.xjyy.orm;
 
 import java.util.List;
 import java.util.Map;
+import java.sql.SQLException;
 import java.util.LinkedList;
 
 import com.xjyy.adapter.Adapter;
@@ -67,6 +68,15 @@ public class DataSource {
 	}
 
 	/**
+	 * 获取Url
+	 * 
+	 * @return
+	 */
+	public String getUrl() {
+		return this.url;
+	}
+
+	/**
 	 * 设置适配器
 	 * 
 	 * @param adapter
@@ -129,7 +139,7 @@ public class DataSource {
 			if (DS_STOP == this.status) {
 				this.status = DS_INITING;
 				for (int i = 0; i < this.minPoolSize; i++) {
-					DSConnection connection = new DSConnection(this.url, this.user, this.password);
+					DSConnection connection = new DSConnection(this, this.user, this.password);
 					this.connections.add(connection);
 				}
 				this.status = DS_READY;
@@ -161,7 +171,7 @@ public class DataSource {
 				}
 			}
 			if (this.connections.size() < this.maxPoolSize) {
-				DSConnection connection = new DSConnection(this.url, this.user, this.password);
+				DSConnection connection = new DSConnection(this, this.user, this.password);
 				this.connections.add(connection);
 				connection.use();
 				return connection;
@@ -321,5 +331,35 @@ public class DataSource {
 				recordType, params);
 		connection.reback();
 		return list;
+	}
+
+	/**
+	 * 执行事务 @throws
+	 */
+	public void runTransaction(TransactionProcesser tp) {
+		DSConnection connection = null;
+		try {
+			connection = getConnection();
+			connection.use().setAutoCommit(false);
+			tp.setAdapter(this.adapter);
+			tp.setConnection(connection);
+			if (tp.run()) {
+				connection.use().commit();
+			} else {
+				connection.use().rollback();
+			}
+
+		} catch (Exception e) {
+			try {
+				connection.use().rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+			e.printStackTrace();
+		} finally {
+			if (connection != null) {
+				connection.reback();
+			}
+		}
 	}
 }

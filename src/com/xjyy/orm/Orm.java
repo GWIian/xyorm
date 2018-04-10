@@ -30,6 +30,12 @@ public class Orm {
 	 * @param ds
 	 */
 	public void addDataSource(DataSource ds) {
+		for (DataSource dataSource : this.dataSources) {
+			if (dataSource.getName().equals(ds.getName())) {
+				System.err.println("数据源已存在，已忽略该数据源");
+				return;
+			}
+		}
 		this.dataSources.add(ds);
 	}
 
@@ -45,6 +51,7 @@ public class Orm {
 	public void init() {
 		for (DataSource x : this.dataSources) {
 			x.init();
+			System.out.println("[数据源：" + x.getName() + " 已启动]");
 		}
 	}
 
@@ -117,6 +124,18 @@ public class Orm {
 	public DataSource getDataSource(String dataSourceName) {
 		for (DataSource x : this.dataSources) {
 			if (x.getName().equals(dataSourceName)) {
+				return x;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * 获取默认数据源
+	 */
+	public DataSource getDataSource() {
+		for (DataSource x : this.dataSources) {
+			if (x.getName().equals("main")) {
 				return x;
 			}
 		}

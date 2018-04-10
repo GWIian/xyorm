@@ -44,22 +44,6 @@ public class OracleAdapter extends Adapter {
 	}
 
 	@Override
-	// public ResultSet getRecords(Connection connection, Table table, String
-	// filter) {
-	// try {
-	// StringBuilder sbSql = new StringBuilder("select * from
-	// ").append(table.getName());
-	// if (filter != null && !filter.trim().equals("")) {
-	// sbSql.append(" where ").append(filter);
-	// }
-	// PreparedStatement stmt =
-	// connection.open().prepareStatement(sbSql.toString());
-	// return stmt.executeQuery();
-	// } catch (SQLException e) {
-	// e.printStackTrace();
-	// }
-	// return null;
-	// }
 	public <T> List<T> getRecords(DSConnection connection, Table table, String filter, Class<T> recordType,
 			Object... params) {
 		List<T> list = new LinkedList<>();
@@ -275,5 +259,15 @@ public class OracleAdapter extends Adapter {
 		rs.close();
 		stmt.close();
 		return list;
+	}
+
+	@Override
+	public boolean isValid(DSConnection connection, int timeout) {
+		try {
+			return connection.use().isValid(timeout);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 }

@@ -15,6 +15,16 @@ public class Model<T> {
 	}
 
 	/**
+	 * 获取dao
+	 * 
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public T dao() {
+		return (T) this;
+	}
+
+	/**
 	 * 初始化映射信息
 	 */
 	private void setMappingInfo() {
@@ -221,6 +231,7 @@ public class Model<T> {
 
 	/**
 	 * 获取对应数据源
+	 * 
 	 * @return
 	 */
 	public DataSource getDataSource() {
