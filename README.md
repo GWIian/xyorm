@@ -30,6 +30,17 @@ public class Start {
 		new Test().set("ID", 1).update();//更新记录
 		new Test().paginate("ID>2",1,20);//根据每页20条获取第一页，条件ID大于2
 		
+		//执行事务
+		Orm.getInstance().getDataSource().runTransaction(new TransactionProcesser() {
+			@Override
+			public boolean run() {
+				save(new Test());//增
+				delete(new Test());//删
+				update(new Test());//改
+				return true;//true提交，false回滚
+			}
+		});
+		
 		Orm.getInstance().stop();//停止ORM
 	}
 }
