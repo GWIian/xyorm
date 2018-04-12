@@ -58,6 +58,8 @@ public class DSConnection {
 		try {
 			if (!this.dataSource.getAdapter().isValid(this, 3000)) {
 				this.status = DSC_INVALID;
+			} else {
+				this.status = DSC_READY;
 			}
 		} catch (Exception e) {
 			this.status = DSC_READY;
