@@ -4,20 +4,20 @@
  
  
  **目前支持的数据库**
- Mysql
- Sqlite
- Oracle
+* Mysql
+* Sqlite
+* Oracle
 
  **Quick Start**
  
  使用基本步骤如下：
- 1、引入xyorm的jar包。
- 2、引入您使用的数据库对应的jdbc connector jar包。
- 3、Orm添加数据源。
- 4、启动Orm。
- 5、添加继承自Model的业务Model类。
- 6、添加Model到Table的映射。
- 7、大工告成。
+ 1. 引入xyorm的jar包。
+ 2. 引入您使用的数据库对应的jdbc connector jar包。
+ 3. Orm添加数据源。
+ 4. 启动Orm。
+ 5. 添加继承自Model的业务Model类。
+ 6. 添加Model到Table的映射。
+ 7. 大工告成。
 
 Start.java
 ```
