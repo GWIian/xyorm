@@ -235,7 +235,30 @@ public class SqliteAdapter extends Adapter {
 	@Override
 	public <T> List<T> getRecordsByPage(DSConnection connection, Table table, int pageNumber, int pageSize,
 			String filter, Class<T> recordType, Object... params) throws Exception {
-		throw new NotImplementedException();
+		StringBuilder sbSql = new StringBuilder("select * from ").append(table.getName());
+		if (filter != null && filter.trim().length() > 0) {
+			sbSql.append(" where ").append(filter.trim());
+		}
+		sbSql.append(" limit ").append(pageSize).append(" offset ").append((pageNumber - 1) * pageSize);
+		System.out.println(sbSql);
+		PreparedStatement stmt = connection.use().prepareStatement(sbSql.toString());
+		int i = 1;
+		for (Object param : params) {
+			stmt.setObject(i++, param);
+		}
+		ResultSet rs = stmt.executeQuery();
+		ArrayList<T> list = new ArrayList<T>();
+		while (rs.next()) {
+			T record = recordType.newInstance();
+			for (i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+				recordType.getMethod("set", String.class, Object.class).invoke(record,
+						rs.getMetaData().getColumnLabel(i), rs.getObject(i));
+			}
+			list.add(record);
+		}
+		rs.close();
+		stmt.close();
+		return list;
 	}
 
 	@Override
