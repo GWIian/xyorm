@@ -13,8 +13,6 @@ import com.xjyy.orm.DSConnection;
 import com.xjyy.orm.Field;
 import com.xjyy.orm.Table;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 public class SqliteAdapter extends Adapter {
 
 	public SqliteAdapter() {
