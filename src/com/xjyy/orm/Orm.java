@@ -61,6 +61,7 @@ public class Orm {
 	public void stop() {
 		for (DataSource x : this.dataSources) {
 			x.stop();
+			System.out.println("[数据源：" + x.getName() + " 已停止]");
 		}
 	}
 

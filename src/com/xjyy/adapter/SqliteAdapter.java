@@ -126,6 +126,15 @@ public class SqliteAdapter extends Adapter {
 				i++;
 			}
 			int ret = stmt.executeUpdate();
+			if (table.getPrimaryKeysName().size() == 1) {
+				if (record.get(table.getPrimaryKeysName().get(0)) == null) {
+					ResultSet rs = stmt.getGeneratedKeys();
+					if (rs.next()) {
+						record.put(table.getPrimaryKeysName().get(0), rs.getObject(1));
+					}
+					rs.close();
+				}
+			}
 			stmt.close();
 
 			return ret;
