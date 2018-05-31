@@ -36,7 +36,7 @@ public class OracleAdapter extends Adapter {
 				table.addField(field);
 			}
 			rs.close();
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -71,7 +71,6 @@ public class OracleAdapter extends Adapter {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 
 		return list;
 	}
@@ -92,12 +91,21 @@ public class OracleAdapter extends Adapter {
 			stmt = connection.use().prepareStatement(sbFields.toString());
 			int i = 1;
 			for (Field x : table.getFields()) {
+				if (record.get(x.getName()).toString().endsWith(".nextval")) {
+					ResultSet rsSeq = connection.use().createStatement()
+							.executeQuery("select " + record.get(x.getName()) + " from dual");
+					if (rsSeq.next()) {
+						record.put(x.getName(), rsSeq.getInt(1));
+					}
+					rsSeq.close();
+					rsSeq.getStatement().close();
+				}
 				stmt.setObject(i, record.get(x.getName()));
 				i++;
 			}
 			int ret = stmt.executeUpdate();
 			stmt.close();
-			
+
 			return ret;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -161,7 +169,7 @@ public class OracleAdapter extends Adapter {
 			sbSql.append(" 1=1");
 		}
 		sbSql.append(sbFilter);
-		//System.out.println(sbSql);
+		// System.out.println(sbSql);
 		PreparedStatement stmt;
 		try {
 			stmt = connection.use().prepareStatement(sbSql.toString());

@@ -48,11 +48,10 @@ public class Start {
 		//执行事务
 		Orm.getInstance().getDataSource().runTransaction(new TransactionProcesser() {
 			@Override
-			public boolean run() {
+			public void run() {
 				save(new Test());//增
 				delete(new Test());//删
 				update(new Test());//改
-				return true;//true提交，false回滚
 			}
 		});
 		

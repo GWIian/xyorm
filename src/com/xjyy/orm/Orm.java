@@ -23,6 +23,10 @@ public class Orm {
 	public static Orm getInstance() {
 		return instance;
 	}
+	
+	public static String getVersion() {
+		return "1.3.1";
+	}
 
 	/**
 	 * 添加数据源

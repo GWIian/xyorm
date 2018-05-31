@@ -50,7 +50,7 @@ public class Test1 {
 		Orm.getInstance().getDataSource().runTransaction(new TransactionProcesser() {
 
 			@Override
-			public boolean run() {
+			public void run() {
 				Student student;
 				Object id;
 
@@ -66,7 +66,6 @@ public class Test1 {
 					}
 				}
 
-				return false;
 			}
 		});
 

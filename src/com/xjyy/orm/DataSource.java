@@ -343,7 +343,8 @@ public class DataSource {
 			connection.use().setAutoCommit(false);
 			tp.setAdapter(this.adapter);
 			tp.setConnection(connection);
-			if (tp.run()) {
+			tp.run();
+			if (!tp.hasError()) {
 				connection.use().commit();
 			} else {
 				connection.use().rollback();
